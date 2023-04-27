@@ -1,54 +1,33 @@
 ARM64寄存器   
 寄存器:说明
-
 X0 ~ X7:用于传递子程序参数和结果，使用时不需要保存，多余参数采用堆栈传递。
 64位返回结果采用 X0 表示，128位返回结果采用 X1:X0 表示。
-
 X8:用于保存子程序返回地址， 尽量不要使用。
-
 X9 ~ X15:临时寄存器，使用时不需要保存。
-
 X16 ~ X17：子程序内部调用寄存器，使用时不需要保存，尽量不要使用。
-
 X18	平台寄存器，它的使用与平台相关，尽量不要使用。
-
 X19 ~ X28：临时寄存器，使用时必须保存。
-
 X29/FP：FP（ Frame Pointer ）栈底指针（64bit）
-
 X30/LR：LR（Link Register）程序链接寄存器（64bit），保存子程序结束后需要执行的下一条指令
-
 X31/SP：SP（Stack Pointer）栈指针（64bit），使用 SP/WSP来进行对SP寄存器的访问。
-
 PC:程序计数器（64bit），俗称PC指针，总是指向即将要执行的下一条指令。
-
 在arm64中，软件是不能改写PC寄存器的。
-
 CPSR:状态寄存器，在arm64位上用pstate代替
-
 注   
 1、ARM64寄存器有两种使用模式，64位时称为 X0 ~ X30，32位时称为 W0 ~ W30。
-
 2、ARM64的LR、FP放在栈顶，而ARM放在栈底；
-
 ARM64中当前FP和SP相同，都是栈顶指针，与x86的BP和SP不同，x86的BP和SP之间是整个函数栈帧；
-
 函数返回时，ARM64先将栈中的LR值放入当前LR，再ret；而ARM直接将栈中的LR值放入PC；
-
 使用gcc编译选项-fomit-frame-pointer，可以使ARM64不使用FP寄存器，这时栈帧稍有变化，栈不在保存FP，局部变量寻址过程也不使用该寄存器。
+
 
 ARM汇编：汇编中proc、endp、ret、near、far指令用法
 
 子程序名 PROC NEAR ( 或 FAR )
-
 ……
-
 ret
-
 子程序名 ENDP
-
 （1）NEAR属性(段内近调用): 调用程序和子程序在同一代码段中,只能被相同代码段的其他程序调用;
-
 FAR属性(段间远调用): 调用程序和子程序不在同一代码段中,可以被相同或不同代码段的程序调用.
 
 （2）proc是定义子程序的伪指令，位置在子程序的开始处，它和endp分别表示子程序定义的开始和结束两者必须成对出现。
@@ -58,6 +37,105 @@ FAR属性(段间远调用): 调用程序和子程序不在同一代码段中,可
 来自 <https://blog.csdn.net/weibo1230123/article/details/84235296>
 
 [ARMv8体系结构基础05：比较和跳转指令]<https://blog.csdn.net/chenchengwudi/article/details/123917082>
+
+
+1. 前言
+WFI(Wait for interrupt)和WFE(Wait for event)是两个让ARM核进入low-power standby模式的指令，由ARM architecture定义，由ARM core实现。它们的区别是什么？使用场景是什么？
+
+SEV：唤醒指令
+
+WFI/WFE：休眠指令
+
+2.WFI和WFE
+
+WFI(Wait for interrupt)和WFE(Wait for event)是两个让ARM核进入low-power standby模式的指令。
+
+这两条指令的作用都是让ARM核进入休眠/待机状态以便降低功耗，但是略有区别：
+
+WFI: wait for Interrupt 等待中断，即下一次中断发生前都在此hold住不干活。
+
+WFE: wait for Events 等待事件，即下一次事件发生前都在此hold住不干活。
+
+
+1）共同点
+
+WFI和WFE的功能非常类似，以ARMv8-A为例（参考DDI0487A_d_armv8_arm.pdf的描述），主要是“将ARMv8-A PE(Processing Element, 处理单元)设置为low-power standby state”。
+
+需要说明的是，ARM architecture并没有规定“low-power standby state”的具体形式，因而可以由ARM core自行发挥，根据ARM的建议，一般可以实现为standby（关闭clock、保持供电）、dormant、shutdown等等。但有个原则，不能造成内存一致性的问题。以Cortex-A57 ARM core为例，它把WFI和WFE实现为“put the core in a low-power state by disabling the clocks in the core while keeping the core powered up”，即我们通常所说的standby模式，保持供电，关闭clock。
+
+2）不同点
+
+那它们的区别体现在哪呢？主要体现进入和退出的方式上。
+
+对WFI来说，执行WFI指令后，ARM core会立即进入low-power standby state，直到有WFI Wakeup events发生。
+
+而WFE则稍微不同，执行WFE指令后，根据Event Register（一个单bit的寄存器，每个PE一个）的状态，有两种情况：如果Event Register为1，该指令会把它清零，然后执行完成（不会standby）；如果Event Register为0，和WFI类似，进入low-power standby state，直到有WFE Wakeup events发生。
+
+WFI wakeup event和WFE wakeup event可以分别让Core从WFI和WFE状态唤醒，这两类Event大部分相同，如任何的IRQ中断、FIQ中断等等，一些细微的差别，可以参考“DDI0487A_d_armv8_arm.pdf“的描述。而最大的不同是，WFE可以被任何PE上执行的SEV指令唤醒。
+
+所谓的SEV指令，就是一个用来改变Event Register的指令。
+
+SEV指令有两个：SEV和SEVL。
+
+SEV会修改所有PE上的寄存器；
+
+SEVL，只修改本PE的寄存器值。
+
+3. 使用场景
+1）WFI
+
+WFI一般用于cpuidle。
+
+2）WFE
+
+WFE的一个典型使用场景，是用在spinlock中（可参考arch_spin_lock，对arm64来说，位于arm64/include/asm/spinlock.h中）。spinlock的功能，是在不同CPU core之间，保护共享资源。使用WFE的流程是：
+
+a）资源空闲
+
+b）Core1访问资源，acquire lock，获得资源
+
+c）Core2访问资源，此时资源不空闲，执行WFE指令，让core进入low-power state
+
+d）Core1释放资源，release lock，释放资源，同时执行SEV指令，唤醒Core2
+
+e）Core2获得资源
+
+以往的spinlock，在获得不到资源时，让Core进入busy loop，而通过插入WFE指令，可以节省功耗。
+
+
+代码中加入ISB和DSB指令是为了保序，防止CPU乱序功能导致不按程序中代码流程执行的问题。
+
+DSB
+数据同步用障是一种特殊类型的内存用障, 只有当此指令执行完毕后,才会执行程序中位于此指令后的指令, 当满足以下条件时,此指
+令才会完成:
+。 位于此指令前的所有显式内存访问均完成。
+位于此指令前的所有缓存、跳转预测和 TLB 维护操作全部完成。
+允许的值为:
+SY
+完整的系统 DSB 操作。 这是缺省情况，可以省略。
+UN
+只可完成于统一点的DSB操作,
+ST
+存储完成后才可执行的DSB 择作。
+UNST
+只有当存储完成后才可执行的DSB 操作，并且只会完成于统一点。
+
+ISB
+指令同步屏障可刷新处理器中的管道，因此可确保在 ISB 指令完成后，才从高速缓存或内存中提取位于该指令后的其他所有指令。这可确
+保提取时间了晚于ISB 指令的指令能够检测到 1SB 指令执行前就已经执行的上下文更改操作的执行效果，例如更改ASID 或已完成的 TLB 维
+护操作，跳转预测维护操作以及对 CP15 寄存器所做的所有更改。
+此外 ，,ISB 指令可确保程序中位于其后的所有跳转指令总会被写入跳转预测逻辑，其写入上下文可确保 ISB 指令后的指令均可检测到这些
+跳转指令, 这是指令流能够正确执行的前提条件,
+option的允许值为:
+SY
+完整的系统DMB 操作。 这是缺省情况，可以省略。
+
+
+
+
+
+
+
 
 
 
