@@ -228,11 +228,11 @@ ARM平台下独占访问指令LDREX和STREX的原理与使用详解
 Linux内核原子操作（1）基本原理
 https://blog.csdn.net/anyegongjuezjd/article/details/125919162
 
+ AXI总线介绍
+ https://blog.csdn.net/xsx_6361/article/details/117417083
  
- 
- 
- 
- 
+ AXI协议规范超详细中文总结版
+ https://blog.csdn.net/HackEle/article/details/125775935?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-125775935-blog-117417083.235^v31^pc_relevant_default_base3&spm=1001.2101.3001.4242.1&utm_relevant_index=3
  
  
  
