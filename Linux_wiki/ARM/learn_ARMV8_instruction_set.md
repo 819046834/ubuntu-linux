@@ -283,11 +283,11 @@ c.不借助中间变量交换2个数
 d.判断两个数是否相等
  
  
+ ARM64平台下WFE和SEV相关指令解析
+ https://blog.csdn.net/Roland_Sun/article/details/107456179?ops_request_misc=&request_id=&biz_id=102&utm_term=wfe%E5%A6%82%E4%BD%95%E7%94%A8%E6%8C%87%E4%BB%A4%E5%94%A4%E9%86%92&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-5-107456179.142^v86^koosearch_v1,239^v2^insert_chatgpt&spm=1018.2226.3001.4187
  
- 
- 
- 
- 
+ARM系列之ARM多核指令WFE、WFI、SEV原理 
+ https://blog.csdn.net/xy010902100449/article/details/126812552?ops_request_misc=&request_id=&biz_id=102&utm_term=wfe%E8%A2%AB%E5%94%A4%E9%86%92&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-0-126812552.nonecase&spm=1018.2226.3001.4187
  
  
  
