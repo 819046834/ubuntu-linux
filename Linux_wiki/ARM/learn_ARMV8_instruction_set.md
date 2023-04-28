@@ -235,6 +235,52 @@ https://blog.csdn.net/anyegongjuezjd/article/details/125919162
  https://blog.csdn.net/HackEle/article/details/125775935?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-125775935-blog-117417083.235^v31^pc_relevant_default_base3&spm=1001.2101.3001.4242.1&utm_relevant_index=3
  
  
+ EOR逻辑异或操作指令
+ https://blog.csdn.net/shuai532209720/article/details/89791636
+ 
+ EOR指令将< shifter_operand > 表示的数值与寄存器< Rn >值按位做逻辑异或操作，并把结果保存到目标寄存器< Rd > 中，同时根据操作的结果更新CPSR中相应的条件标志位。
+ 
+ 指令的语法格式
+ 
+EOR{< cond >} {S} < Rd >, < Rn> ,< shifter_operand >
+
+其中：
+
+< Rn > 寄存器为第1个操作数所在的寄存器。
+ 
+< shifter_operand >为第2个操作数。
+ 
+ 指令的使用
+ 
+EOR指令可用于将寄存器中某些位的值取反。将某一位与0做逻辑异或操作，该位的值不变；将某一位与1做逻辑异或操作，该位的值被求反；
+ 
+ 示例：
+ 
+ EOR R1, R0, R0, ROR #16 ;R1 = A^C,B^D,C^A,D^B
+ 
+ eor指令将Rn 的值与操作数operand2按位逻辑”异或”，相同为0，不同为1，结果存放到目的寄存器Rd 中。
+ 
+ ARMv8体系结构基础04：算术和移位指令
+ 
+ https://blog.csdn.net/chenchengwudi/article/details/123828339
+ 
+ 说明1：异或运算的特点
+
+ 任何数和0异或后保持不变
+ 
+ 任何数和1异或后取反
+ 
+ 说明2：异或运算使用场景示例
+
+根据上述异或运算的特点，就有了如下的使用场景示例，
+
+a.将数值中的指定位翻转;只要将要翻转的位与1异或即可
+
+b.将变量清零
+ 
+c.不借助中间变量交换2个数
+ 
+d.判断两个数是否相等
  
  
  
