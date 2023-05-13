@@ -290,12 +290,12 @@ ARM系列之ARM多核指令WFE、WFI、SEV原理
  https://blog.csdn.net/xy010902100449/article/details/126812552?ops_request_misc=&request_id=&biz_id=102&utm_term=wfe%E8%A2%AB%E5%94%A4%E9%86%92&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-0-126812552.nonecase&spm=1018.2226.3001.4187
  
  
+ [知乎]ARM Cortex-A 系列ARMv8-A程序员指南：第14章 多核处理器  
+ https://zhuanlan.zhihu.com/p/453687153
  
  
- 
- 
- 
- 
+ armv8 程序员指南
+ https://developer.arm.com/documentation/ddi0595/2021-09/AArch64-Registers/CNTKCTL-EL1--Counter-timer-Kernel-Control-register?lang=en
  
  
  
